@@ -2,83 +2,57 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Lyric Cloud Generator</title>
+    <title>Task 08 - Lyric Word Cloud</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/wordcloud@1.2.2/src/wordcloud2.min.js"></script>
     <style>
         body { background: #0f172a; color: white; font-family: sans-serif; }
-        .canvas-container { background: rgba(255,255,255,0.05); border-radius: 20px; border: 2px dashed #334155; }
+        .canvas-box { background: #1e293b; border-radius: 1rem; border: 2px solid #334155; }
     </style>
 </head>
-<body class="p-8">
-    <div class="max-w-3xl mx-auto text-center">
-        <h1 class="text-4xl font-bold mb-2 text-pink-500">LyricCloud Pro</h1>
-        <p class="text-slate-400 mb-8">Enter a Song & Artist to visualize the lyrics</p>
-
-        <div class="flex gap-2 mb-10">
-            <input id="artist" type="text" placeholder="Artist (e.g. Adele)" class="flex-1 p-4 rounded-lg bg-slate-800 border border-slate-700 outline-none">
-            <input id="song" type="text" placeholder="Song (e.g. Hello)" class="flex-1 p-4 rounded-lg bg-slate-800 border border-slate-700 outline-none">
-            <button onclick="generateCloud()" class="bg-pink-600 hover:bg-pink-700 px-8 py-4 rounded-lg font-bold">GENERATE</button>
+<body class="p-6">
+    <div class="max-w-3xl mx-auto">
+        <h1 class="text-3xl font-black text-center text-pink-500 mb-6 italic">LYRIC CLOUD GENERATOR</h1>
+        
+        <div class="bg-slate-800 p-6 rounded-2xl shadow-xl mb-6">
+            <p class="text-slate-400 text-sm mb-2 font-bold uppercase">Paste Lyrics Below:</p>
+            <textarea id="lyricInput" class="w-full h-32 p-4 rounded-lg bg-slate-900 border border-slate-700 text-white focus:border-pink-500 outline-none mb-4" placeholder="Paste song lyrics here..."></textarea>
+            
+            <button onclick="makeCloud()" class="w-full bg-pink-600 hover:bg-pink-700 py-4 rounded-xl font-black tracking-widest transition-all">
+                GENERATE WORD CLOUD
+            </button>
         </div>
 
-        <div id="loading" class="hidden mb-4 text-pink-400 animate-pulse">Fetching lyrics and analyzing patterns...</div>
-        
-        <div class="canvas-container p-4">
-            <canvas id="wordCloudCanvas" width="600" height="400" class="w-full"></canvas>
+        <div class="canvas-box p-4 flex justify-center overflow-hidden">
+            <canvas id="cloudCanvas" width="700" height="400"></canvas>
         </div>
     </div>
+
     <script>
-    async function getLyrics() {
-        const artist = document.getElementById('artist').value;
-        const song = document.getElementById('song').value;
-        const status = document.getElementById('status');
-        
-        if(!artist || !song) return alert("Please enter both fields!");
-        status.innerText = "Searching lyrics...";
+        function makeCloud() {
+            const text = document.getElementById('lyricInput').value;
+            if(!text) return alert("Please paste some lyrics first!");
 
-        try {
-            const res = await fetch(`https://api.lyrics.ovh/v1/${artist}/${song}`);
-            const data = await res.json();
-            
-            let lyricsText = "";
-
-            if (data.lyrics) {
-                lyricsText = data.lyrics;
-                status.innerText = "Lyrics found! Building cloud...";
-            } else {
-                // FALLBACK: If API fails, we use a sample lyric set to demonstrate the tool works
-                status.innerText = "API busy. Using sample data for demo...";
-                lyricsText = "Love love love heart soul heart baby love song music rhythm beat soul heart love music";
-            }
-
-            // Simple Logic: Process the text
-            const words = lyricsText.toLowerCase()
-                .replace(/[^\w\s]/g, "")
+            // Human logic: Clean the text and count common words
+            const words = text.toLowerCase()
+                .replace(/[^\w\s]/g, "") 
                 .split(/\s+/)
-                .filter(w => w.length > 3);
+                .filter(w => w.length > 3); // Ignore short words
 
             const counts = {};
             words.forEach(w => counts[w] = (counts[w] || 0) + 1);
 
-            const list = Object.entries(counts).map(([text, count]) => [text, count * 10]);
+            // Format for the library: [word, size]
+            const list = Object.entries(counts).map(([word, count]) => [word, count * 15]);
 
-            // Draw the cloud
-            WordCloud(document.getElementById('myCanvas'), { 
+            WordCloud(document.getElementById('cloudCanvas'), { 
                 list: list,
-                backgroundColor: '#1f2937',
+                backgroundColor: '#1e293b',
                 color: 'random-light',
-                weightFactor: 2
-            });
-
-        } catch (e) {
-            status.innerText = "Using fallback demo data...";
-            // Manual data if network is blocked
-            WordCloud(document.getElementById('myCanvas'), { 
-                list: [['Music', 40], ['Lyrics', 30], ['Cloud', 25], ['Hackathon', 20]],
-                backgroundColor: '#1f2937'
+                rotateRatio: 0.5,
+                gridSize: 10
             });
         }
-    }
-</script>
+    </script>
 </body>
 </html>
