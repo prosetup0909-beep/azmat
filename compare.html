@@ -28,6 +28,60 @@
         <div id="resultsArea" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6">
             </div>
     </div>
+<script>
+        
+        
+        function comparePrices() {
+            const input = document.getElementById('productSearch').value;
+            
+            // Basic validation check
+            if (input === "") {
+                alert("Please enter a product name first!");
+                return;
+            }
 
+            
+            
+            const store1 = { name: "Amazon Hub", price: Math.floor(Math.random() * 100) + 500 };
+            const store2 = { name: "eBay Global", price: Math.floor(Math.random() * 100) + 480 };
+            const store3 = { name: "Walmart Pro", price: Math.floor(Math.random() * 100) + 510 };
+
+            const allStores = [store1, store2, store3];
+
+            
+            let cheapest = allStores[0].price;
+            for (let i = 0; i < allStores.length; i++) {
+                if (allStores[i].price < cheapest) {
+                    cheapest = allStores[i].price;
+                }
+            }
+
+            
+            const results = document.getElementById('resultsArea');
+            results.classList.remove('hidden');
+            results.innerHTML = ""; 
+
+            
+            allStores.forEach(item => {
+                let bestTag = "";
+                let highlightClass = "";
+                
+                
+                if (item.price === cheapest) {
+                    bestTag = '<div class="best-badge">BEST VALUE</div>';
+                    highlightClass = 'best-price';
+                }
+
+                results.innerHTML += `
+                    <div class="mega-glass p-6 rounded-2xl ${highlightClass}">
+                        ${bestTag}
+                        <h3 class="text-slate-400 font-bold uppercase text-xs">${item.name}</h3>
+                        <div class="text-3xl font-black mt-2">$${item.price}</div>
+                        <button class="w-full mt-4 py-2 bg-slate-800 rounded-lg text-xs">Buy Now</button>
+                    </div>
+                `;
+            });
+        }
+    </script>
 </body>
 </html>
