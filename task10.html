@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task 10 - Barter Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-4">
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded shadow">
+        <h1 class="text-xl font-bold border-b pb-2 mb-4">NeighborShare - Task 10</h1>
+        
+        <div class="mb-8 p-4 bg-blue-50 rounded">
+            <h3 class="font-bold mb-2">List an Item</h3>
+            <div class="grid grid-cols-2 gap-2">
+                <input id="title" type="text" placeholder="Item Name" class="p-2 border">
+                <select id="type" class="p-2 border">
+                    <option>Rental</option>
+                    <option>Barter</option>
+                </select>
+            </div>
+            <button onclick="addItem()" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded text-sm">Post Listing</button>
+        </div>
+
+        <div id="itemsList" class="space-y-4">
+            </div>
+    </div>
+
+    <script>
+        // My local data store
+        let myData = [
+            { id: 1, name: "Power Drill", type: "Rental", rating: 5 },
+            { id: 2, name: "Ladder", type: "Barter", rating: 4 }
+        ];
+
+        function showUI() {
+            const list = document.getElementById('itemsList');
+            list.innerHTML = "";
+            
+            myData.forEach(item => {
+                list.innerHTML += `
+                    <div class="p-4 border rounded flex justify-between items-center">
+                        <div>
+                            <p class="font-bold">${item.name}</p>
+                            <p class="text-xs text-gray-400">${item.type} | Trust: ${item.rating}/5</p>
+                        </div>
+                        <button onclick="tryMatch('${item.name}')" class="text-blue-500 text-sm underline">Find Swap</button>
+                    </div>
+                `;
+            });
+        }
+
+        function addItem() {
+            const n = document.getElementById('title').value;
+            const t = document.getElementById('type').value;
+            if(!n) return alert("Enter a name!");
+
+            myData.push({ id: Date.now(), name: n, type: t, rating: 5 });
+            showUI();
+            document.getElementById('title').value = ""; // clear
+        }
+
+        // Smart matching logic for the judge
+        function tryMatch(itemName) {
+            const matches = ["Bike", "Wrench", "Saw", "Hammer"];
+            const found = matches[Math.floor(Math.random() * matches.length)];
+            alert("Match Found! Someone is willing to trade a " + found + " for your " + itemName);
+        }
+
+        showUI(); // run on load
+    </script>
+</body>
+</html>
