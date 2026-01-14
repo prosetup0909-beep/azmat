@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Task 09 - Campus Resource Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        body { background: #0f172a; color: white; font-family: 'Inter', sans-serif; }
+        .resource-card { background: #1e293b; transition: all 0.3s ease; border: 1px solid #334155; }
+        .resource-card:hover { transform: translateY(-5px); border-color: #60a5fa; }
+    </style>
+</head>
+<body class="p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <div class="flex justify-between items-center mb-10">
+            <h1 class="text-3xl font-black text-blue-500 uppercase tracking-tighter">Campus Connect <span class="text-white font-light">Resources</span></h1>
+            <button onclick="showAdmin()" class="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-full font-bold text-sm">ADMIN PORTAL</button>
+        </div>
+
+        <div class="mb-10">
+            <input type="text" id="searchInput" onkeyup="filterResources()" placeholder="Search labs, halls, projectors..." 
+            class="w-full bg-slate-800 border border-slate-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 text-lg">
+        </div>
+
+        <div id="catalogGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            </div>
+    </div>
+
+    <script>
+        
+        const resources = [
+            { id: 1, name: "AI Research Lab", type: "Lab", status: "Available", color: "text-green-400" },
+            { id: 2, name: "Main Convocation Hall", type: "Hall", status: "Available", color: "text-green-400" },
+            { id: 3, name: "AR/VR Equipment Kit", type: "Equipment", status: "Booked", color: "text-red-400" },
+            { id: 4, name: "Chemistry Lab B", type: "Lab", status: "Available", color: "text-green-400" }
+        ];
+
+        
+        function displayResources(data) {
+            const grid = document.getElementById('catalogGrid');
+            grid.innerHTML = data.map(item => `
+                <div class="resource-card p-6 rounded-3xl shadow-xl">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-xs font-bold uppercase tracking-widest text-slate-500">${item.type}</span>
+                        <span class="text-xs font-mono ${item.color}">${item.status}</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-6">${item.name}</h3>
+                    <button onclick="handleBooking(${item.id})" 
+                        class="w-full ${item.status === 'Available' ? 'bg-slate-700 hover:bg-blue-600' : 'bg-red-900 cursor-not-allowed'} py-3 rounded-xl font-bold text-sm transition-colors">
+                        ${item.status === 'Available' ? 'BOOK SLOT' : 'OCCUPIED'}
+                    </button>
+                </div>
+            `).join('');
+        }
+
+      
+        function filterResources() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = resources.filter(r => r.name.toLowerCase().includes(query) || r.type.toLowerCase().includes(query));
+            displayResources(filtered);
+        }
+
+        
+        function handleBooking(id) {
+            const res = resources.find(r => r.id === id);
+            
+            
+            if(res.status === "Booked") {
+                Swal.fire('Conflict!', 'This resource is already booked to prevent underutilization.', 'error');
+                return;
+            }
+
+            Swal.fire({
+                title: 'Confirm Booking',
+                text: `Requesting access to ${res.name}`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Submit Request'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Simulate Email/SMS Notification
+                    Swal.fire('Success!', 'Booking request sent. Admin will review via Dashboard.', 'success');
+                }
+            });
+        }
+
+        function showAdmin() {
+            Swal.fire({
+                title: 'Admin Dashboard',
+                html: '<div class="text-left text-sm text-black"><b>Pending Requests:</b><br>• Student 102 -> AI Lab<br>• Staff 09 -> Convocation Hall</div>',
+                confirmButtonText: 'Back'
+            });
+        }
+
+        
+        displayResources(resources);
+    </script>
+</body>
+</html>
